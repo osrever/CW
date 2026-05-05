@@ -80,6 +80,7 @@ let audioContext;
 let timer;
 let playbackTimer;
 let isPlaying = false;
+let audioUnlocked = false;
 let game = freshGame();
 
 function freshGame() {
@@ -205,6 +206,24 @@ function ensureAudio() {
   return audioContext;
 }
 
+async function unlockAudio() {
+  const context = ensureAudio();
+  if (context.state === "suspended") {
+    await context.resume();
+  }
+
+  if (!audioUnlocked) {
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    gain.gain.value = 0.0001;
+    oscillator.frequency.value = TONE_FREQUENCY;
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.02);
+    audioUnlocked = true;
+  }
+}
+
 function tone(start, duration) {
   const context = ensureAudio();
   const oscillator = context.createOscillator();
@@ -224,8 +243,8 @@ function tone(start, duration) {
 async function playSignal() {
   if (!game.current || isPlaying) return;
 
+  await unlockAudio();
   const context = ensureAudio();
-  if (context.state === "suspended") await context.resume();
 
   const code = MORSE[game.current];
   const dit = 1.2 / Number(ui.wpm.value);
@@ -269,12 +288,13 @@ function nextSignal() {
   playSignal();
 }
 
-function startGame() {
+async function startGame() {
   if (game.active) {
     pauseGame();
     return;
   }
 
+  await unlockAudio();
   const now = Date.now();
 
   if (game.answered === 0) {
