@@ -1,0 +1,164 @@
+.page-shell {
+  padding: 28px 14px 18px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+}
+
+.hero p {
+  min-width: 130px;
+  min-height: 44px;
+  margin-top: 12px;
+  font-size: 1.05rem;
+}
+
+.card {
+  padding: clamp(18px, 4vw, 34px);
+  border-radius: 30px;
+}
+
+.settings-grid {
+  gap: 12px;
+}
+
+.control {
+  gap: 7px;
+}
+
+.control span,
+.speed-control span,
+.status-row span,
+.score-grid span {
+  font-size: 0.76rem;
+}
+
+.control select,
+.control input {
+  min-height: 50px;
+  padding: 0 14px;
+  border-radius: 14px;
+}
+
+.speed-control {
+  gap: 16px;
+  margin-top: 18px;
+  padding: 18px 22px;
+  border-radius: 18px;
+}
+
+.speed-control strong {
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+}
+
+.play-area {
+  padding-top: 30px;
+}
+
+.status-row div {
+  padding: 13px;
+  border-radius: 14px;
+}
+
+.status-row strong {
+  font-size: 1.45rem;
+}
+
+.actions {
+  grid-template-columns: 0.95fr 1.05fr 1fr 0.82fr;
+}
+
+.button {
+  min-height: 62px;
+  border-radius: 18px;
+}
+
+.button.sound.is-on {
+  background: #e8f9f0;
+  box-shadow: none;
+  color: #12864c;
+}
+
+.score-grid {
+  margin-top: 26px;
+}
+
+.score-grid div {
+  padding: 16px 10px 0;
+}
+
+.score-grid strong {
+  font-size: 1.6rem;
+}
+
+.review {
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.review li {
+  padding: 7px 10px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 560px) {
+  .page-shell {
+    padding: 10px 8px;
+  }
+
+  .hero {
+    margin-bottom: 10px;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero p {
+    min-height: 38px;
+    margin-top: 8px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .settings-grid,
+  .status-row,
+  .score-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .speed-control {
+    margin-top: 12px;
+    padding: 14px;
+  }
+
+  .play-area {
+    gap: 18px;
+    padding-top: 20px;
+  }
+
+  .radio {
+    width: 126px;
+    height: 126px;
+  }
+
+  .answer-box input {
+    height: 76px;
+    font-size: 3rem;
+  }
+
+  .score-grid div {
+    padding: 12px 8px;
+  }
+}
