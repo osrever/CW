@@ -69,18 +69,12 @@
 }
 
 .actions {
-  grid-template-columns: 0.95fr 1.05fr 1fr 0.82fr;
+  grid-template-columns: 1.15fr 1fr 0.85fr;
 }
 
 .button {
   min-height: 62px;
   border-radius: 18px;
-}
-
-.button.sound.is-on {
-  background: #e8f9f0;
-  box-shadow: none;
-  color: #12864c;
 }
 
 .score-grid {
@@ -135,7 +129,7 @@
   }
 
   .actions {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .speed-control {
