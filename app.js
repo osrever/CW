@@ -206,20 +206,20 @@ function ensureAudio() {
   return audioContext;
 }
 
-async function unlockAudio() {
+function unlockAudio() {
   const context = ensureAudio();
   if (context.state === "suspended") {
-    await context.resume();
+    context.resume();
   }
 
   if (!audioUnlocked) {
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    gain.gain.value = 0.0001;
+    gain.gain.setValueAtTime(0.001, context.currentTime);
     oscillator.frequency.value = TONE_FREQUENCY;
     oscillator.connect(gain).connect(context.destination);
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.02);
+    oscillator.start(context.currentTime);
+    oscillator.stop(context.currentTime + 0.04);
     audioUnlocked = true;
   }
 }
@@ -240,10 +240,10 @@ function tone(start, duration) {
   oscillator.stop(start + duration + 0.03);
 }
 
-async function playSignal() {
+function playSignal() {
   if (!game.current || isPlaying) return;
 
-  await unlockAudio();
+  unlockAudio();
   const context = ensureAudio();
 
   const code = MORSE[game.current];
@@ -288,13 +288,13 @@ function nextSignal() {
   playSignal();
 }
 
-async function startGame() {
+function startGame() {
   if (game.active) {
     pauseGame();
     return;
   }
 
-  await unlockAudio();
+  unlockAudio();
   const now = Date.now();
 
   if (game.answered === 0) {
@@ -430,6 +430,10 @@ ui.sessionMode.addEventListener("change", syncSettingsView);
 ui.duration.addEventListener("change", syncSettingsView);
 ui.targetCount.addEventListener("input", syncSettingsView);
 ui.wpm.addEventListener("input", syncWpm);
+ui.start.addEventListener("pointerdown", unlockAudio, { passive: true });
+ui.repeat.addEventListener("pointerdown", unlockAudio, { passive: true });
+ui.start.addEventListener("touchstart", unlockAudio, { passive: true });
+ui.repeat.addEventListener("touchstart", unlockAudio, { passive: true });
 ui.start.addEventListener("click", startGame);
 ui.repeat.addEventListener("click", playSignal);
 ui.reset.addEventListener("click", resetGame);
