@@ -165,6 +165,23 @@ function feedback(text, type = "") {
   ui.feedback.className = type;
 }
 
+function focusAnswer() {
+  const x = window.scrollX;
+  const y = window.scrollY;
+
+  try {
+    ui.answer.focus({ preventScroll: true });
+  } catch {
+    ui.answer.focus();
+  }
+
+  window.requestAnimationFrame(() => {
+    if (Math.abs(window.scrollY - y) > 2 || Math.abs(window.scrollX - x) > 2) {
+      window.scrollTo(x, y);
+    }
+  });
+}
+
 function lockSettings(locked) {
   [ui.contentMode, ui.duration, ui.wpm].forEach((field) => {
     field.disabled = locked;
@@ -291,7 +308,7 @@ function playSignal() {
     ui.answer.readOnly = false;
     ui.repeat.disabled = false;
     ui.signalState.textContent = "Sin audio";
-    feedback("El audio no ha arrancado. Pulsa Volver a oir.", "wrong");
+    feedback("El audio no ha arrancado. Pulsa Volver a oír.", "wrong");
   };
 
   try {
@@ -312,7 +329,7 @@ function playSignal() {
       ui.answer.disabled = false;
       ui.answer.readOnly = false;
       ui.repeat.disabled = false;
-      ui.answer.focus();
+      focusAnswer();
     }
   }, Math.max(320, (totalDuration + dit * 2) * 1000));
 }
@@ -321,7 +338,7 @@ function nextSignal() {
   game.current = randomCharacter();
   ui.answer.value = "";
   ui.answer.classList.remove("good", "wrong");
-  feedback("Escucha primero. Cuando termine, escribe el caracter.", "");
+  feedback("Escucha primero. Cuando termine, escribe el carácter.", "");
   playSignal();
 }
 
@@ -383,7 +400,7 @@ function resetGame() {
   ui.answer.classList.remove("good", "wrong");
   ui.history.innerHTML = "";
   ui.signalState.textContent = "Preparado";
-  feedback("Pulsa empezar para escuchar el primer codigo.", "");
+  feedback("Pulsa empezar para escuchar el primer código.", "");
   syncSettingsView();
   syncStats();
 }
