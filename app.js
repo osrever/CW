@@ -41,6 +41,7 @@ const LETTERS = Object.keys(MORSE).filter((key) => /[A-Z]/.test(key));
 const NUMBERS = Object.keys(MORSE).filter((key) => /\d/.test(key));
 const TONE_FREQUENCY = 750;
 const RAMP_SECONDS = 0.006;
+const MEMORY_KEY = "dadidaTrainerMemory";
 
 const ui = {
   contentMode: document.querySelector("#contentMode"),
@@ -68,6 +69,7 @@ const ui = {
   sumAccuracy: document.querySelector("#sumAccuracy"),
   sumRate: document.querySelector("#sumRate"),
   summaryText: document.querySelector("#summaryText"),
+  reviewList: document.querySelector("#reviewList"),
   closeSummary: document.querySelector("#closeSummary"),
 };
 
@@ -93,7 +95,32 @@ function freshGame() {
     target: 60,
     recent: [],
     history: [],
+    mistakes: [],
   };
+}
+
+function loadMemory() {
+  try {
+    const memory = JSON.parse(localStorage.getItem(MEMORY_KEY));
+    if (memory && typeof memory === "object") {
+      return {
+        characters: memory.characters || {},
+        pairs: memory.pairs || {},
+      };
+    }
+  } catch {
+    // Ignore corrupt local data and start fresh.
+  }
+
+  return { characters: {}, pairs: {} };
+}
+
+function saveMemory(memory) {
+  try {
+    localStorage.setItem(MEMORY_KEY, JSON.stringify(memory));
+  } catch {
+    // Storage can fail in private modes; the trainer still works without memory.
+  }
 }
 
 function charactersForMode() {
@@ -107,10 +134,53 @@ function randomCharacter() {
   const recent = new Set(game.recent.slice(-4));
   const options = characters.filter((character) => !recent.has(character));
   const pool = options.length ? options : characters;
-  const character = pool[Math.floor(Math.random() * pool.length)];
+  const memory = loadMemory();
+  const weakCharacters = pool.filter((character) => memory.characters[character] > 0);
+  let character;
+
+  if (weakCharacters.length && Math.random() < 0.42) {
+    const weighted = weakCharacters.flatMap((weakCharacter) =>
+      Array(Math.min(6, memory.characters[weakCharacter])).fill(weakCharacter)
+    );
+    character = weighted[Math.floor(Math.random() * weighted.length)];
+  } else {
+    character = pool[Math.floor(Math.random() * pool.length)];
+  }
+
   game.recent.push(character);
   game.recent = game.recent.slice(-8);
   return character;
+}
+
+function rememberMistake(answer, expected) {
+  const memory = loadMemory();
+  const pairKey = `${answer || "?"}>${expected}`;
+
+  memory.characters[expected] = Math.min(12, (memory.characters[expected] || 0) + 2);
+  memory.pairs[pairKey] = Math.min(12, (memory.pairs[pairKey] || 0) + 1);
+  saveMemory(memory);
+}
+
+function rewardCorrect(character) {
+  const memory = loadMemory();
+  if (!memory.characters[character]) return;
+
+  memory.characters[character] -= 1;
+  if (memory.characters[character] <= 0) delete memory.characters[character];
+  saveMemory(memory);
+}
+
+function groupedMistakes() {
+  const groups = new Map();
+
+  game.mistakes.forEach(({ answer, expected }) => {
+    const key = `${answer || "?"}>${expected}`;
+    const item = groups.get(key) || { answer: answer || "?", expected, count: 0 };
+    item.count += 1;
+    groups.set(key, item);
+  });
+
+  return [...groups.values()].sort((a, b) => b.count - a.count).slice(0, 8);
 }
 
 function selectedTarget() {
@@ -431,9 +501,12 @@ function answerCurrent(value) {
     game.streak += 1;
     ui.answer.classList.add("good");
     feedback("Correcto.", "good");
+    rewardCorrect(game.current);
   } else {
     game.wrong += 1;
     game.streak = 0;
+    game.mistakes.push({ answer, expected: game.current });
+    rememberMistake(answer, game.current);
     ui.answer.classList.add("wrong");
     feedback(`Era ${game.current}.`, "wrong");
   }
@@ -466,10 +539,33 @@ function finishGame(title) {
   ui.summaryText.textContent = `Has reconocido ${game.correct} caracteres en ${Math.round(
     game.target / 60
   )} minuto(s) a ${ui.wpm.value} wpm.`;
+  renderReview();
 
   if (typeof ui.summary.showModal === "function") {
     ui.summary.showModal();
   }
+}
+
+function renderReview() {
+  const mistakes = groupedMistakes();
+
+  if (!mistakes.length) {
+    ui.reviewList.innerHTML = `<p class="review-empty">Sin fallos en esta partida.</p>`;
+    return;
+  }
+
+  ui.reviewList.innerHTML = mistakes
+    .map(
+      ({ answer, expected, count }) => `
+        <span class="review-item">
+          <strong class="review-wrong">${answer}</strong>
+          <span>→</span>
+          <strong class="review-right">${expected}</strong>
+          ${count > 1 ? `<small>${count}x</small>` : ""}
+        </span>
+      `
+    )
+    .join("");
 }
 
 ui.duration.addEventListener("change", syncSettingsView);
