@@ -430,6 +430,54 @@ select {
   font-weight: 700;
 }
 
+.review-panel {
+  margin: 18px 0;
+}
+
+.review-panel h3 {
+  margin: 0 0 10px;
+  color: var(--blue);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.review-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.review-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 5px 9px;
+  border: 2px solid var(--blue);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--blue-dark);
+  font-weight: 900;
+}
+
+.review-wrong {
+  color: var(--red);
+}
+
+.review-right {
+  color: var(--green);
+}
+
+.review-item small {
+  color: var(--blue-dark);
+  font-size: 0.72rem;
+}
+
+.review-empty {
+  margin: 0;
+  color: var(--ink);
+}
+
 .summary .button {
   width: 100%;
   min-height: 64px;
