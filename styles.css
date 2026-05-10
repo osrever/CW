@@ -283,6 +283,7 @@ select {
 
 .answer-box {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   gap: 16px;
   padding-top: 8px;
@@ -298,7 +299,9 @@ select {
 
 .answer-box input {
   order: 2;
+  justify-self: center;
   width: min(100%, 470px);
+  margin-inline: auto;
   height: 132px;
   border: 3px solid var(--blue);
   border-radius: 14px;
@@ -354,7 +357,7 @@ select {
 }
 
 .signal-state,
-.history {
+history {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -600,7 +603,7 @@ select {
   }
 
   .answer-box input {
-    width: calc(100% - 12px);
+    width: min(calc(100% - 28px), 470px);
     height: 112px;
     font-size: 3.7rem;
   }
