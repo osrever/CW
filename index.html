@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Morse Trainer Pro</title>
+    <title>da-di-da</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,36 +11,38 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="compact.css" />
   </head>
   <body>
     <main class="page-shell">
       <section class="trainer" aria-labelledby="pageTitle">
-        <header class="hero">
-          <h1 id="pageTitle">Morse Trainer Pro</h1>
-          <p>EA7FMN</p>
+        <header class="hero" aria-label="da-di-da">
+          <div class="brand-lockup">
+            <img src="assets/logo-dadida.svg" alt="da-di-da EA7FMN" />
+            <img src="assets/union.svg" alt="" aria-hidden="true" />
+          </div>
+
+          <section class="intro-card">
+            <h1 id="pageTitle">Practica telegrafia jugando</h1>
+            <p>
+              Elige si quieres jugar con letras, numeros o con letras y numeros y luego el
+              tiempo de juego. Intenta superar el numero de letras acertadas en cada jugada y
+              consigue mas velocidad de recepcion.
+            </p>
+          </section>
         </header>
 
-        <section class="card">
+        <section class="settings-panel">
           <div class="settings-grid">
             <label class="control">
-              <span>Contenido</span>
+              <span>Elige</span>
               <select id="contentMode">
                 <option value="letters">Letras</option>
                 <option value="numbers">Numeros</option>
-                <option value="mixed">Letras y Numeros</option>
+                <option value="mixed">Todos</option>
               </select>
             </label>
 
             <label class="control">
-              <span>Modo de partida</span>
-              <select id="sessionMode">
-                <option value="time">Por tiempo</option>
-                <option value="count">Por cantidad</option>
-              </select>
-            </label>
-
-            <label class="control" id="timeControl">
               <span>Duracion</span>
               <select id="duration">
                 <option value="60">1 minuto</option>
@@ -49,86 +51,64 @@
               </select>
             </label>
 
-            <label class="control is-hidden" id="countControl">
-              <span>Caracteres</span>
-              <input id="targetCount" type="number" min="5" max="250" step="5" value="30" />
+            <label class="speed-control">
+              <span>Velocidad</span>
+              <input id="wpm" type="range" min="8" max="35" step="1" value="27" />
+              <strong id="wpmText">27 wpm</strong>
             </label>
           </div>
+        </section>
 
-          <label class="speed-control">
-            <span>Velocidad de transmision <strong id="wpmText">27 WPM</strong></span>
-            <input id="wpm" type="range" min="8" max="30" step="1" value="27" />
-          </label>
+        <section class="play-area" aria-live="polite">
+          <div class="actions">
+            <button id="start" class="button primary" type="button">Empezar</button>
+            <button id="repeat" class="button orange" type="button" disabled>Volver a oir</button>
+          </div>
 
-          <section class="play-area" aria-live="polite">
-            <div class="status-row">
-              <div>
-                <span>Restante</span>
-                <strong id="remaining">1:00</strong>
+          <div class="game-stats">
+            <div class="stat-card large">
+              <span>Restante</span>
+              <strong id="remaining">01:00</strong>
+            </div>
+            <div class="stat-card large">
+              <span>Respondidas</span>
+              <strong id="answered">0</strong>
+            </div>
+
+            <div class="mini-scores">
+              <div class="mini-card">
+                <span>Aciertos</span>
+                <strong class="ok" id="correct">0</strong>
               </div>
-              <div>
-                <span>Respondidas</span>
-                <strong id="answered">0</strong>
-              </div>
-              <div>
-                <span>Racha</span>
-                <strong id="streak">0</strong>
+              <div class="mini-card">
+                <span>Fallos</span>
+                <strong class="bad" id="wrong">0</strong>
               </div>
             </div>
+          </div>
 
-            <div class="radio" id="radio" aria-hidden="true">
-              <div class="antenna"></div>
-              <div class="speaker"></div>
-              <div class="dial"></div>
-            </div>
-
-            <div class="answer-box">
-              <label for="answer">Tu respuesta</label>
-              <input
-                id="answer"
-                type="text"
-                maxlength="1"
-                autocomplete="off"
-                autocapitalize="characters"
-                disabled
-                placeholder="?"
-              />
-              <p id="feedback">Pulsa empezar para escuchar el primer codigo.</p>
-            </div>
-
-            <div class="actions">
-              <button id="start" class="button primary" type="button">Empezar</button>
-              <button id="repeat" class="button dark" type="button" disabled>Repetir sonido</button>
-              <button id="reset" class="button quiet" type="button" disabled>Reiniciar</button>
-            </div>
+          <section class="answer-box">
+            <label for="answer">Escribe tu respuesta</label>
+            <input
+              id="answer"
+              type="text"
+              maxlength="1"
+              autocomplete="off"
+              autocapitalize="characters"
+              disabled
+              aria-describedby="feedback"
+            />
+            <p id="feedback">Pulsa empezar para escuchar el primer codigo.</p>
           </section>
 
-          <section class="score-grid" aria-label="Marcador">
-            <div>
-              <span>Aciertos</span>
-              <strong class="ok" id="correct">0</strong>
-            </div>
-            <div>
-              <span>Fallos</span>
-              <strong class="bad" id="wrong">0</strong>
-            </div>
-            <div>
-              <span>Efectividad</span>
-              <strong class="blue" id="accuracy">0%</strong>
-            </div>
-            <div>
-              <span>Aciertos/min</span>
-              <strong id="rate">0</strong>
-            </div>
+          <section class="extra-stats" aria-label="Marcador adicional">
+            <span>Efectividad <strong id="accuracy">0%</strong></span>
+            <span>Aciertos/min <strong id="rate">0</strong></span>
+            <span>Racha <strong id="streak">0</strong></span>
           </section>
 
-          <section class="review">
-            <div class="review-title">
-              <h2>Ultimas respuestas</h2>
-              <span id="signalState">Preparado</span>
-            </div>
-            <ol id="history" aria-label="Ultimas respuestas"></ol>
-          </section>
+          <span id="signalState" class="signal-state">Preparado</span>
+          <ol id="history" class="history" aria-label="Ultimas respuestas"></ol>
         </section>
       </section>
 
