@@ -142,26 +142,17 @@ select {
   display: block;
 }
 
-.select-shell::before,
 .select-shell::after {
   content: "";
   position: absolute;
   right: 18px;
-  width: 11px;
-  height: 11px;
-  border-top: 4px solid var(--white);
-  border-left: 4px solid var(--white);
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 3px solid var(--white);
+  border-bottom: 3px solid var(--white);
   pointer-events: none;
-}
-
-.select-shell::before {
-  top: 12px;
-  transform: rotate(45deg);
-}
-
-.select-shell::after {
-  bottom: 12px;
-  transform: rotate(225deg);
+  transform: translateY(-62%) rotate(45deg);
 }
 
 .control select:focus,
@@ -534,20 +525,11 @@ select {
     font-size: 0.86rem;
   }
 
-  .select-shell::before,
   .select-shell::after {
     right: 12px;
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-width: 3px;
-  }
-
-  .select-shell::before {
-    top: 12px;
-  }
-
-  .select-shell::after {
-    bottom: 12px;
   }
 
   .speed-control strong {
