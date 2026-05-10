@@ -44,11 +44,7 @@ const RAMP_SECONDS = 0.006;
 
 const ui = {
   contentMode: document.querySelector("#contentMode"),
-  sessionMode: document.querySelector("#sessionMode"),
   duration: document.querySelector("#duration"),
-  targetCount: document.querySelector("#targetCount"),
-  timeControl: document.querySelector("#timeControl"),
-  countControl: document.querySelector("#countControl"),
   wpm: document.querySelector("#wpm"),
   wpmText: document.querySelector("#wpmText"),
   remaining: document.querySelector("#remaining"),
@@ -59,7 +55,6 @@ const ui = {
   feedback: document.querySelector("#feedback"),
   start: document.querySelector("#start"),
   repeat: document.querySelector("#repeat"),
-  reset: document.querySelector("#reset"),
   correct: document.querySelector("#correct"),
   wrong: document.querySelector("#wrong"),
   accuracy: document.querySelector("#accuracy"),
@@ -119,17 +114,13 @@ function randomCharacter() {
 }
 
 function selectedTarget() {
-  if (ui.sessionMode.value === "count") {
-    return Number(ui.targetCount.value);
-  }
-
   return Number(ui.duration.value);
 }
 
 function formatClock(seconds) {
   const safeSeconds = Math.max(0, Math.ceil(seconds));
   const minutes = Math.floor(safeSeconds / 60);
-  return `${minutes}:${String(safeSeconds % 60).padStart(2, "0")}`;
+  return `${String(minutes).padStart(2, "0")}:${String(safeSeconds % 60).padStart(2, "0")}`;
 }
 
 function elapsedSeconds() {
@@ -147,17 +138,13 @@ function rateValue() {
 }
 
 function syncSettingsView() {
-  const countMode = ui.sessionMode.value === "count";
-  ui.timeControl.classList.toggle("is-hidden", countMode);
-  ui.countControl.classList.toggle("is-hidden", !countMode);
-
-  game.mode = ui.sessionMode.value;
+  game.mode = "time";
   game.target = selectedTarget();
-  ui.remaining.textContent = countMode ? String(game.target) : formatClock(game.target);
+  ui.remaining.textContent = formatClock(game.target);
 }
 
 function syncWpm() {
-  ui.wpmText.textContent = `${ui.wpm.value} WPM`;
+  ui.wpmText.textContent = `${ui.wpm.value} wpm`;
 }
 
 function syncStats() {
@@ -166,15 +153,10 @@ function syncStats() {
   ui.accuracy.textContent = `${accuracyValue()}%`;
   ui.rate.textContent = rateValue();
   ui.streak.textContent = game.streak;
-  ui.answered.textContent =
-    game.mode === "count" ? `${game.answered}/${game.target}` : String(game.answered);
+  ui.answered.textContent = String(game.answered);
 
   if (game.active && game.mode === "time") {
     ui.remaining.textContent = formatClock((game.endAt - Date.now()) / 1000);
-  }
-
-  if (game.mode === "count") {
-    ui.remaining.textContent = String(Math.max(0, game.target - game.answered));
   }
 }
 
@@ -184,7 +166,7 @@ function feedback(text, type = "") {
 }
 
 function lockSettings(locked) {
-  [ui.contentMode, ui.sessionMode, ui.duration, ui.targetCount, ui.wpm].forEach((field) => {
+  [ui.contentMode, ui.duration, ui.wpm].forEach((field) => {
     field.disabled = locked;
   });
 }
@@ -194,7 +176,6 @@ function setActive(active) {
   ui.answer.disabled = !active;
   ui.answer.readOnly = false;
   ui.repeat.disabled = !active || isPlaying;
-  ui.reset.disabled = !active && game.answered === 0;
   ui.start.textContent = active ? "Pausar" : game.answered ? "Continuar" : "Empezar";
   lockSettings(active);
 }
@@ -300,26 +281,32 @@ function playSignal() {
   ui.answer.disabled = false;
   ui.answer.readOnly = false;
   ui.repeat.disabled = true;
-  ui.radio.classList.add("is-playing");
+  ui.radio?.classList.add("is-playing");
   ui.signalState.textContent = "Escuchando";
 
-  const playPromise = playBlob(buildToneWav(durations, gaps));
-  if (playPromise) {
-    playPromise.catch(() => {
-      isPlaying = false;
-      ui.radio.classList.remove("is-playing");
-      ui.answer.disabled = false;
-      ui.answer.readOnly = false;
-      ui.repeat.disabled = false;
-      ui.signalState.textContent = "Sin audio";
-      feedback("iOS ha bloqueado el audio. Pulsa Empezar o Repetir sonido otra vez.", "wrong");
-    });
+  const handleAudioError = () => {
+    isPlaying = false;
+    ui.radio?.classList.remove("is-playing");
+    ui.answer.disabled = false;
+    ui.answer.readOnly = false;
+    ui.repeat.disabled = false;
+    ui.signalState.textContent = "Sin audio";
+    feedback("El audio no ha arrancado. Pulsa Volver a oir.", "wrong");
+  };
+
+  try {
+    const playPromise = playBlob(buildToneWav(durations, gaps));
+    if (playPromise) {
+      playPromise.catch(handleAudioError);
+    }
+  } catch {
+    handleAudioError();
   }
 
   window.clearTimeout(playbackTimer);
   playbackTimer = window.setTimeout(() => {
     isPlaying = false;
-    ui.radio.classList.remove("is-playing");
+    ui.radio?.classList.remove("is-playing");
     ui.signalState.textContent = "Responde";
     if (game.active) {
       ui.answer.disabled = false;
@@ -349,7 +336,7 @@ function startGame() {
   if (game.answered === 0) {
     game = {
       ...freshGame(),
-      mode: ui.sessionMode.value,
+      mode: "time",
       target: selectedTarget(),
       startedAt: now,
     };
@@ -358,9 +345,7 @@ function startGame() {
   } else {
     const pauseDuration = now - game.pausedAt;
     game.startedAt += pauseDuration;
-    if (game.mode === "time") {
-      game.endAt += pauseDuration;
-    }
+    game.endAt += pauseDuration;
   }
 
   setActive(true);
@@ -369,7 +354,7 @@ function startGame() {
 
   timer = window.setInterval(() => {
     syncStats();
-    if (game.mode === "time" && Date.now() >= game.endAt) {
+    if (Date.now() >= game.endAt) {
       finishGame("Tiempo completado");
     }
   }, 250);
@@ -394,7 +379,6 @@ function resetGame() {
   game = freshGame();
   ui.answer.readOnly = false;
   setActive(false);
-  ui.reset.disabled = true;
   ui.answer.value = "";
   ui.answer.classList.remove("good", "wrong");
   ui.history.innerHTML = "";
@@ -440,11 +424,6 @@ function answerCurrent(value) {
   saveHistory(answer, game.current, success);
   syncStats();
 
-  if (game.mode === "count" && game.answered >= game.target) {
-    window.setTimeout(() => finishGame("Cantidad completada"), 520);
-    return;
-  }
-
   window.setTimeout(() => {
     if (game.active) nextSignal();
   }, success ? 430 : 820);
@@ -458,7 +437,6 @@ function finishGame(title) {
   ui.answer.disabled = true;
   ui.answer.readOnly = false;
   ui.repeat.disabled = true;
-  ui.reset.disabled = false;
   ui.start.textContent = "Empezar";
   ui.signalState.textContent = "Partida terminada";
   lockSettings(false);
@@ -468,23 +446,19 @@ function finishGame(title) {
   ui.sumWrong.textContent = game.wrong;
   ui.sumAccuracy.textContent = `${accuracyValue()}%`;
   ui.sumRate.textContent = rateValue();
-  ui.summaryText.textContent =
-    game.mode === "time"
-      ? `Has reconocido ${game.correct} caracteres en ${Math.round(game.target / 60)} minuto(s).`
-      : `Has terminado una serie de ${game.target} caracteres a ${ui.wpm.value} WPM.`;
+  ui.summaryText.textContent = `Has reconocido ${game.correct} caracteres en ${Math.round(
+    game.target / 60
+  )} minuto(s) a ${ui.wpm.value} wpm.`;
 
   if (typeof ui.summary.showModal === "function") {
     ui.summary.showModal();
   }
 }
 
-ui.sessionMode.addEventListener("change", syncSettingsView);
 ui.duration.addEventListener("change", syncSettingsView);
-ui.targetCount.addEventListener("input", syncSettingsView);
 ui.wpm.addEventListener("input", syncWpm);
 ui.start.addEventListener("click", startGame);
 ui.repeat.addEventListener("click", playSignal);
-ui.reset.addEventListener("click", resetGame);
 ui.closeSummary.addEventListener("click", () => {
   ui.summary.close();
   resetGame();
