@@ -601,16 +601,16 @@ select {
 
   .control select {
     min-height: 38px;
-    padding-right: 34px;
+    padding-right: 26px;
     padding-left: 8px;
-    font-size: 0.86rem;
+    font-size: 0.76rem;
   }
 
   .select-shell::after {
-    right: 12px;
-    width: 8px;
-    height: 8px;
-    border-width: 3px;
+    right: 10px;
+    width: 6px;
+    height: 6px;
+    border-width: 2px;
   }
 
   .speed-control strong {
