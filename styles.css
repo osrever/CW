@@ -186,6 +186,8 @@ select {
 }
 
 .button {
+  min-width: 0;
+  padding-inline: 10px;
   min-height: 80px;
   border: 0;
   border-radius: 18px;
@@ -194,6 +196,7 @@ select {
   font-size: 1.78rem;
   font-weight: 900;
   line-height: 1;
+  white-space: nowrap;
   text-transform: uppercase;
 }
 
@@ -218,6 +221,7 @@ select {
 }
 
 .stat-card {
+  min-width: 0;
   min-height: 90px;
   padding: 14px 16px;
   border-radius: var(--radius);
@@ -245,9 +249,11 @@ select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  min-width: 0;
 }
 
 .mini-card {
+  min-width: 0;
   min-height: 56px;
   padding: 7px 8px;
   border: 2px solid var(--blue);
@@ -487,7 +493,7 @@ select {
   .button {
     min-height: 80px;
     border-radius: 18px;
-    font-size: 1.76rem;
+    font-size: 1.42rem;
   }
 
   .game-stats {
@@ -500,7 +506,7 @@ select {
   }
 
   .answer-box label {
-    font-size: 1.9rem;
+    font-size: 1.72rem;
   }
 
   .answer-box:focus-within {
@@ -519,8 +525,12 @@ select {
 }
 
 @media (max-width: 480px) {
+  .brand-lockup img:last-child {
+    width: 44px;
+  }
+
   .brand-lockup img:first-child {
-    width: min(68vw, 208px);
+    width: min(58vw, 190px);
   }
 
   .settings-grid {
@@ -564,48 +574,64 @@ select {
   }
 
   .button {
-    min-height: 80px;
-    font-size: 1.55rem;
+    min-height: 74px;
+    border-radius: 16px;
+    font-size: clamp(1rem, 5.2vw, 1.34rem);
   }
 
   .game-stats {
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.26fr) minmax(0, 1.18fr);
+    gap: 10px;
   }
 
   .stat-card {
-    min-height: 90px;
-    padding: 14px 12px;
+    min-height: 82px;
+    padding: 12px 8px;
   }
 
   .stat-card span {
-    font-size: 0.9rem;
+    font-size: 0.78rem;
   }
 
   .stat-card strong {
-    font-size: 1.8rem;
+    font-size: 1.62rem;
   }
 
   .mini-scores {
-    gap: 14px;
+    gap: 8px;
   }
 
   .mini-card {
-    min-height: 56px;
-    padding: 7px 6px;
+    min-height: 50px;
+    padding: 6px 4px;
   }
 
   .mini-card span {
-    font-size: 0.72rem;
+    font-size: 0.58rem;
   }
 
   .mini-card strong {
-    font-size: 1.25rem;
+    margin-top: 4px;
+    font-size: 1.1rem;
+  }
+
+  .answer-box label {
+    font-size: 1.62rem;
   }
 
   .answer-box input {
-    width: min(58vw, 344px);
-    height: 96px;
-    font-size: 3.2rem;
+    width: min(58vw, 300px);
+    height: 86px;
+    font-size: 2.8rem;
+  }
+
+  .answer-box p {
+    font-size: 0.82rem;
+  }
+
+  .extra-stats {
+    gap: 8px 14px;
+    font-size: 0.75rem;
   }
 
   .summary-grid {
