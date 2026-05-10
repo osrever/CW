@@ -181,8 +181,8 @@ select {
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(18px, 12vw, 78px);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(14px, 8vw, 58px);
 }
 
 .button {
@@ -487,7 +487,7 @@ select {
   }
 
   .actions {
-    gap: clamp(18px, 12vw, 78px);
+    gap: clamp(14px, 8vw, 58px);
   }
 
   .button {
@@ -497,7 +497,7 @@ select {
   }
 
   .button.orange {
-    font-size: 1.16rem;
+    font-size: 1.22rem;
   }
 
   .game-stats {
@@ -574,7 +574,7 @@ select {
   }
 
   .actions {
-    gap: clamp(18px, 12vw, 78px);
+    gap: clamp(14px, 8vw, 58px);
   }
 
   .button {
@@ -584,7 +584,7 @@ select {
   }
 
   .button.orange {
-    font-size: clamp(0.82rem, 4.1vw, 1.02rem);
+    font-size: clamp(0.92rem, 4.45vw, 1.12rem);
   }
 
   .game-stats {
