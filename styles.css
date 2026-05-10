@@ -600,6 +600,7 @@ select {
   }
 
   .answer-box input {
+    width: calc(100% - 12px);
     height: 112px;
     font-size: 3.7rem;
   }
