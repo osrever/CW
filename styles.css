@@ -496,6 +496,10 @@ select {
     font-size: 1.42rem;
   }
 
+  .button.orange {
+    font-size: 1.16rem;
+  }
+
   .game-stats {
     grid-template-columns: 1fr 1fr 1.1fr;
     gap: 16px;
@@ -577,6 +581,10 @@ select {
     min-height: 74px;
     border-radius: 16px;
     font-size: clamp(1rem, 5.2vw, 1.34rem);
+  }
+
+  .button.orange {
+    font-size: clamp(0.82rem, 4.1vw, 1.02rem);
   }
 
   .game-stats {
