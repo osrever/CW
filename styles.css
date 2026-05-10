@@ -357,7 +357,7 @@ select {
 }
 
 .signal-state,
-history {
+.history {
   position: absolute;
   width: 1px;
   height: 1px;
