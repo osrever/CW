@@ -289,6 +289,7 @@ select {
 }
 
 .answer-box label {
+  order: 1;
   color: var(--blue);
   font-size: 2rem;
   font-weight: 900;
@@ -296,6 +297,7 @@ select {
 }
 
 .answer-box input {
+  order: 2;
   width: min(100%, 470px);
   height: 132px;
   border: 3px solid var(--blue);
@@ -319,6 +321,7 @@ select {
 }
 
 .answer-box p {
+  order: 3;
   min-height: 20px;
   margin: 0;
   color: var(--blue-dark);
@@ -496,6 +499,20 @@ select {
 
   .answer-box label {
     font-size: 2rem;
+  }
+
+  .answer-box:focus-within {
+    gap: 10px;
+    padding-top: 0;
+  }
+
+  .answer-box:focus-within input {
+    order: 3;
+  }
+
+  .answer-box:focus-within p {
+    order: 2;
+    max-width: 92%;
   }
 }
 
