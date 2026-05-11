@@ -66,7 +66,7 @@ const ui = {
   summaryTitle: document.querySelector("#summaryTitle"),
   sumCorrect: document.querySelector("#sumCorrect"),
   sumWrong: document.querySelector("#sumWrong"),
-  sumAccuracy: document.querySelector("#sumAccuracy"),
+  sumAnswered: document.querySelector("#sumAnswered"),
   sumRate: document.querySelector("#sumRate"),
   summaryText: document.querySelector("#summaryText"),
   reviewList: document.querySelector("#reviewList"),
@@ -534,11 +534,11 @@ function finishGame(title) {
   ui.summaryTitle.textContent = title;
   ui.sumCorrect.textContent = game.correct;
   ui.sumWrong.textContent = game.wrong;
-  ui.sumAccuracy.textContent = `${accuracyValue()}%`;
+  ui.sumAnswered.textContent = game.answered;
   ui.sumRate.textContent = rateValue();
-  ui.summaryText.textContent = `Has reconocido ${game.correct} caracteres en ${Math.round(
+  ui.summaryText.textContent = `Has dado ${game.answered} respuestas en ${Math.round(
     game.target / 60
-  )} minuto(s) a ${ui.wpm.value} wpm.`;
+  )} minuto(s): ${game.correct} aciertos y ${game.wrong} fallos a ${ui.wpm.value} wpm.`;
   renderReview();
 
   if (typeof ui.summary.showModal === "function") {
