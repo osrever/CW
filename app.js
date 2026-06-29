@@ -39,6 +39,38 @@ const MORSE = {
 
 const LETTERS = Object.keys(MORSE).filter((key) => /[A-Z]/.test(key));
 const NUMBERS = Object.keys(MORSE).filter((key) => /\d/.test(key));
+const QSO_GROUPS = [
+  "CQ",
+  "DE",
+  "K",
+  "KN",
+  "BK",
+  "BT",
+  "GM",
+  "GA",
+  "GE",
+  "GN",
+  "OM",
+  "TNX",
+  "TKS",
+  "TU",
+  "FER",
+  "RST",
+  "UR",
+  "NAME",
+  "QTH",
+  "WX",
+  "RIG",
+  "ANT",
+  "PWR",
+  "FB",
+  "HW",
+  "CPY",
+  "QSL",
+  "73",
+  "SK",
+];
+const MAX_ANSWER_LENGTH = Math.max(...QSO_GROUPS.map((group) => group.length));
 const TONE_FREQUENCY = 750;
 const RAMP_SECONDS = 0.006;
 const MEMORY_KEY = "dadidaTrainerMemory";
@@ -126,6 +158,7 @@ function saveMemory(memory) {
 function charactersForMode() {
   if (ui.contentMode.value === "letters") return LETTERS;
   if (ui.contentMode.value === "numbers") return NUMBERS;
+  if (ui.contentMode.value === "qso") return QSO_GROUPS;
   return [...LETTERS, ...NUMBERS];
 }
 
@@ -187,6 +220,14 @@ function selectedTarget() {
   return Number(ui.duration.value);
 }
 
+function expectedAnswerLength() {
+  return ui.contentMode.value === "qso" ? MAX_ANSWER_LENGTH : 1;
+}
+
+function syncAnswerMode() {
+  ui.answer.maxLength = expectedAnswerLength();
+}
+
 function formatClock(seconds) {
   const safeSeconds = Math.max(0, Math.ceil(seconds));
   const minutes = Math.floor(safeSeconds / 60);
@@ -211,6 +252,7 @@ function syncSettingsView() {
   game.mode = "time";
   game.target = selectedTarget();
   ui.remaining.textContent = formatClock(game.target);
+  syncAnswerMode();
 }
 
 function syncWpm() {
@@ -341,6 +383,34 @@ function buildToneWav(durations, gaps, volume = 0.72) {
   return makeWavBlob(samples, sampleRate);
 }
 
+function signalTimings(signal) {
+  const dit = 1.2 / Number(ui.wpm.value);
+  const dah = dit * 3;
+  const durations = [];
+  const gaps = [];
+
+  [...signal].forEach((character, characterIndex, characters) => {
+    const code = MORSE[character];
+    if (!code) return;
+
+    [...code].forEach((symbol, symbolIndex, symbols) => {
+      durations.push(symbol === "." ? dit : dah);
+
+      const hasNextSymbol = symbolIndex < symbols.length - 1;
+      const hasNextCharacter = characterIndex < characters.length - 1;
+      if (hasNextSymbol) {
+        gaps.push(dit);
+      } else if (hasNextCharacter) {
+        gaps.push(dit * 3);
+      } else {
+        gaps.push(0);
+      }
+    });
+  });
+
+  return { dit, durations, gaps };
+}
+
 function playBlob(blob) {
   const audio = ensureAudioElement();
   audio.pause();
@@ -354,11 +424,7 @@ function playBlob(blob) {
 function playSignal() {
   if (!game.current || isPlaying) return;
 
-  const code = MORSE[game.current];
-  const dit = 1.2 / Number(ui.wpm.value);
-  const dah = dit * 3;
-  const durations = [...code].map((symbol) => (symbol === "." ? dit : dah));
-  const gaps = durations.map((_, index) => (index < durations.length - 1 ? dit : 0));
+  const { dit, durations, gaps } = signalTimings(game.current);
   const totalDuration =
     durations.reduce((sum, duration) => sum + duration, 0) +
     gaps.reduce((sum, gap) => sum + gap, 0) +
@@ -408,7 +474,12 @@ function nextSignal() {
   game.current = randomCharacter();
   ui.answer.value = "";
   ui.answer.classList.remove("good", "wrong");
-  feedback("Escucha primero. Cuando termine, escribe el carácter.", "");
+  feedback(
+    ui.contentMode.value === "qso"
+      ? "Escucha primero. Cuando termine, escribe el grupo."
+      : "Escucha primero. Cuando termine, escribe el carácter.",
+    ""
+  );
   playSignal();
 }
 
@@ -568,6 +639,7 @@ function renderReview() {
     .join("");
 }
 
+ui.contentMode.addEventListener("change", syncAnswerMode);
 ui.duration.addEventListener("change", syncSettingsView);
 ui.wpm.addEventListener("input", syncWpm);
 ui.start.addEventListener("click", startGame);
@@ -583,9 +655,12 @@ ui.answer.addEventListener("input", () => {
     return;
   }
 
-  const clean = ui.answer.value.replace(/[^a-z0-9]/gi, "").slice(0, 1).toUpperCase();
+  const clean = ui.answer.value
+    .replace(/[^a-z0-9]/gi, "")
+    .slice(0, game.current.length || expectedAnswerLength())
+    .toUpperCase();
   ui.answer.value = clean;
-  if (clean) answerCurrent(clean);
+  if (game.current && clean.length === game.current.length) answerCurrent(clean);
 });
 
 syncSettingsView();
