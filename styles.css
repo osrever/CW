@@ -318,6 +318,49 @@ select {
   text-transform: uppercase;
 }
 
+.answer-tools {
+  order: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 34px;
+}
+
+.reveal-button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 2px solid var(--blue);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--blue);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.reveal-button:disabled {
+  opacity: 0.45;
+}
+
+.shown-signal {
+  display: none;
+  min-width: 52px;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  background: var(--blue);
+  color: var(--white);
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.shown-signal.is-visible {
+  display: inline-flex;
+  justify-content: center;
+}
+
 .answer-box input.good {
   border-color: var(--green);
   background: rgba(255, 255, 255, 0.24);
@@ -329,7 +372,7 @@ select {
 }
 
 .answer-box p {
-  order: 3;
+  order: 4;
   min-height: 20px;
   margin: 0;
   color: var(--blue-dark);
@@ -567,12 +610,16 @@ select {
   }
 
   .answer-box:focus-within input {
-    order: 3;
+    order: 4;
   }
 
   .answer-box:focus-within p {
     order: 2;
     max-width: 92%;
+  }
+
+  .answer-box:focus-within .answer-tools {
+    order: 3;
   }
 }
 
@@ -683,6 +730,22 @@ select {
 
   .answer-box p {
     font-size: 0.82rem;
+  }
+
+  .answer-tools {
+    min-height: 30px;
+  }
+
+  .reveal-button {
+    min-height: 30px;
+    padding-inline: 11px;
+    font-size: 0.72rem;
+  }
+
+  .shown-signal {
+    min-width: 46px;
+    padding: 4px 10px;
+    font-size: 0.9rem;
   }
 
   .extra-stats {
