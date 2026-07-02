@@ -70,6 +70,11 @@ const QSO_GROUPS = [
   "73",
   "SK",
 ];
+const PROSIGNS = {
+  BT: "-...-",
+  KN: "-.--.",
+  SK: "...-.-",
+};
 const MAX_ANSWER_LENGTH = Math.max(...QSO_GROUPS.map((group) => group.length));
 const TONE_FREQUENCY = 750;
 const RAMP_SECONDS = 0.006;
@@ -388,16 +393,16 @@ function signalTimings(signal) {
   const dah = dit * 3;
   const durations = [];
   const gaps = [];
+  const units = PROSIGNS[signal] ? [PROSIGNS[signal]] : [...signal].map((character) => MORSE[character]);
 
-  [...signal].forEach((character, characterIndex, characters) => {
-    const code = MORSE[character];
+  units.forEach((code, characterIndex) => {
     if (!code) return;
 
     [...code].forEach((symbol, symbolIndex, symbols) => {
       durations.push(symbol === "." ? dit : dah);
 
       const hasNextSymbol = symbolIndex < symbols.length - 1;
-      const hasNextCharacter = characterIndex < characters.length - 1;
+      const hasNextCharacter = characterIndex < units.length - 1;
       if (hasNextSymbol) {
         gaps.push(dit);
       } else if (hasNextCharacter) {
