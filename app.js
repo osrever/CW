@@ -136,6 +136,9 @@ const ui = {
   radio: document.querySelector("#radio"),
   answer: document.querySelector("#answer"),
   feedback: document.querySelector("#feedback"),
+  qsoAssist: document.querySelector("#qsoAssist"),
+  showSignal: document.querySelector("#showSignal"),
+  shownSignal: document.querySelector("#shownSignal"),
   start: document.querySelector("#start"),
   repeat: document.querySelector("#repeat"),
   correct: document.querySelector("#correct"),
@@ -276,6 +279,25 @@ function expectedAnswerLength() {
 
 function syncAnswerMode() {
   ui.answer.maxLength = expectedAnswerLength();
+  syncQsoAssist();
+}
+
+function isQsoMode() {
+  return ui.contentMode.value === "qso";
+}
+
+function hideRevealedSignal() {
+  ui.shownSignal.textContent = "";
+  ui.shownSignal.classList.remove("is-visible");
+}
+
+function syncQsoAssist() {
+  ui.qsoAssist.classList.toggle("is-hidden", !isQsoMode());
+  ui.showSignal.disabled = !game.active || !isQsoMode() || !game.current;
+
+  if (!isQsoMode()) {
+    hideRevealedSignal();
+  }
 }
 
 function formatClock(seconds) {
@@ -357,6 +379,7 @@ function setActive(active) {
   ui.repeat.disabled = !active || isPlaying;
   ui.start.textContent = active ? "Pausar" : game.answered ? "Continuar" : "Empezar";
   lockSettings(active);
+  syncQsoAssist();
 }
 
 function ensureAudioElement() {
@@ -524,12 +547,14 @@ function nextSignal() {
   game.current = randomCharacter();
   ui.answer.value = "";
   ui.answer.classList.remove("good", "wrong");
+  hideRevealedSignal();
   feedback(
-    ui.contentMode.value === "qso"
+    isQsoMode()
       ? "Escucha primero. Cuando termine, escribe el grupo."
       : "Escucha primero. Cuando termine, escribe el carácter.",
     ""
   );
+  syncQsoAssist();
   playSignal();
 }
 
@@ -576,6 +601,7 @@ function pauseGame() {
   ui.answer.readOnly = false;
   setActive(false);
   ui.repeat.disabled = true;
+  syncQsoAssist();
   feedback("Partida pausada.", "");
   ui.signalState.textContent = "Pausa";
 }
@@ -589,6 +615,7 @@ function resetGame() {
   setActive(false);
   ui.answer.value = "";
   ui.answer.classList.remove("good", "wrong");
+  hideRevealedSignal();
   ui.history.innerHTML = "";
   ui.signalState.textContent = "Preparado";
   feedback("Pulsa empezar para escuchar el primer código.", "");
@@ -633,6 +660,7 @@ function answerCurrent(value) {
   }
 
   saveHistory(answer, game.current, success);
+  hideRevealedSignal();
   syncStats();
 
   window.setTimeout(() => {
@@ -651,6 +679,7 @@ function finishGame(title) {
   ui.start.textContent = "Empezar";
   ui.signalState.textContent = "Partida terminada";
   lockSettings(false);
+  syncQsoAssist();
 
   ui.summaryTitle.textContent = title;
   ui.sumCorrect.textContent = game.correct;
@@ -694,6 +723,13 @@ ui.duration.addEventListener("change", syncSettingsView);
 ui.wpm.addEventListener("input", syncWpm);
 ui.start.addEventListener("click", startGame);
 ui.repeat.addEventListener("click", playSignal);
+ui.showSignal.addEventListener("click", () => {
+  if (!game.active || !isQsoMode() || !game.current) return;
+
+  ui.shownSignal.textContent = game.current;
+  ui.shownSignal.classList.add("is-visible");
+  focusAnswer();
+});
 ui.closeSummary.addEventListener("click", () => {
   ui.summary.close();
   resetGame();
